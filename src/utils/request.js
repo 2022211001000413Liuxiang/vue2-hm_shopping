@@ -11,6 +11,13 @@ const instance = axios.create({
 // 添加请求拦截器
 instance.interceptors.request.use(function (config) {
   // 在发送请求之前做些什么
+  // 开启loding，禁止背景点击（节流，防止无效触发）
+  Toast.loading({
+    message: '加载中...',
+    forbidClick: true,
+    loadingType: 'spinner',
+    duration: 0
+  })
   return config
 }, function (error) {
   // 对请求错误做些什么
@@ -23,8 +30,11 @@ instance.interceptors.response.use(function (response) {
   // 对响应数据做点什么
   const res = response.data
   if (res.status !== 200) {
+    // Toast是单列模式，后面的Toast会覆盖前面的Toast
     Toast.fail(res.message)
     return Promise.reject(res)
+  } else {
+    Toast.clear()
   }
   return response.data
 }, function (error) {

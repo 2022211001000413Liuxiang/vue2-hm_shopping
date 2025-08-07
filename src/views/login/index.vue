@@ -98,6 +98,7 @@ export default {
         Toast.fail('请输入正确的短信验证码')
         return
       }
+      console.log('发送登录请求......')
 
       const res = await login(this.phoneNumber, this.msgCode)
       this.$store.commit('user/setUserInfo', res.data)
