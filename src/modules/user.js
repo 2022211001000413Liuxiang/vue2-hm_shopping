@@ -3,7 +3,7 @@ export default {
   namespaced: true,
   state () {
     return {
-      userInfo: getInfo
+      userInfo: getInfo()
     }
   },
 
