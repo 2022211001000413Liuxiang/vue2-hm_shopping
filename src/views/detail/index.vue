@@ -65,15 +65,16 @@
 
     <!-- 底部 -->
     <div class="footer">
-      <div class="icon-home">
+      <div class="icon-home" @click="$router.push('/')">
         <van-icon name="wap-home-o" />
         <span>首页</span>
       </div>
-      <div class="icon-cart">
+      <div class="icon-cart" @click="$router.push('/cart')">
+        <span v-if="cartTotal > 0" class="num">{{ cartTotal }}</span>
         <van-icon name="shopping-cart-o" />
         <span>购物车</span>
       </div>
-      <div class="btn-add" @click="addCart()" >加入购物车</div>
+      <div class="btn-add" @click="addFn()" >加入购物车</div>
       <div class="btn-buy" @click="buy()">立刻购买</div>
     </div>
     <!--购物车弹层-->
@@ -99,7 +100,7 @@
       <count-box v-model="addCount"></count-box>
     </div>
     <div class="showbtn" v-if="detail.stock_total>0">
-      <div class="btn" v-if="mode === 'cart'">加入购物车</div>
+      <div class="btn" v-if="mode === 'cart'" @click="addCart()">加入购物车</div>
       <div class="btn now" v-else>立刻购买</div>
     </div>
     <div class="btn-none" v-else>该商品已抢完</div>
@@ -112,6 +113,7 @@
 import { getProductComment, getProductDetail } from '@/api/product'
 import defaultImg from '@/assets/default-avatar.png'
 import CountBox from '@/components/CountBox.vue'
+import { addCart } from '@/api/cart'
 export default {
   name: 'ProDetail',
   components: {
@@ -130,7 +132,8 @@ export default {
       defaultImg,
       show: false,
       mode: 'cart',
-      addCount: 5
+      addCount: 5,
+      cartTotal: 0// 购物车角标
     }
   },
   methods: {
@@ -149,13 +152,36 @@ export default {
       this.total = total
     },
 
-    addCart () {
+    addFn () {
       this.mode = 'cart'
       this.show = true
     },
     buy () {
       this.mode = 'buy'
       this.show = true
+    },
+    async addCart () {
+      if (!this.$store.getters.token) {
+        this.$dialog.confirm({
+          title: '温馨提示',
+          message: '您还未登录，请先登录',
+          confirmButtonText: '去登录',
+          cancelButtonText: '取消'
+        }).then(() => {
+          this.$router.replace({
+            path: '/login',
+            query: { backUrl: this.$route.fullPath }
+          })
+        }).catch(() => {
+        })
+        return
+      }
+
+      const { data } = await addCart(this.goodsId, this.addCount, this.detail.skuList[0].goods_sku_id)
+      this.cartTotal = data.cartTotal
+      this.$toast.success('添加成功')
+      this.show = false
+      console.log(this.cartTotal)
     }
   },
   computed: {
@@ -362,6 +388,23 @@ export default {
   }
   .btn-none {
     background-color: #cccccc;
+  }
+}
+
+.footer .icon-cart {
+  position: relative;
+  padding: 0 6px;
+  .num {
+    z-index: 999;
+    position: absolute;
+    top: -2px;
+    right: 0;
+    min-width: 16px;
+    padding: 0 4px;
+    color: #fff;
+    text-align: center;
+    background-color: #ee0a24;
+    border-radius: 50%;
   }
 }
 </style>

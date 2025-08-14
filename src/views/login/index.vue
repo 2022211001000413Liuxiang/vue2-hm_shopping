@@ -102,7 +102,9 @@ export default {
 
       const res = await login(this.phoneNumber, this.msgCode)
       this.$store.commit('user/setUserInfo', res.data)
-      this.$router.push('/')
+
+      const backUrl = this.$route.query.backUrl || '/'
+      this.$router.replace(backUrl)
       Toast.success('登录成功')
     }
 
