@@ -22,3 +22,9 @@ export const updateCartNum = (goodsId, goodsNum, goodsSkuId) => {
     goodsSkuId
   })
 }
+
+export const deleteCart = (cartIds) => {
+  return request.post('/cart/clear', {
+    cartIds
+  })
+}

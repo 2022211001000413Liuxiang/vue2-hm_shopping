@@ -1,4 +1,5 @@
-import { getCartList, updateCartNum } from '@/api/cart'
+import { deleteCart, getCartList, updateCartNum } from '@/api/cart'
+import { Toast } from 'vant'
 
 export default {
   namespaced: true,
@@ -38,6 +39,14 @@ export default {
       if (res.status === 200) {
         context.dispatch('getCartAction')
       }
+    },
+
+    async deleteCart (context) {
+      const ids = context.getters.selCartList.map(item => item.id)
+      await deleteCart(ids)
+      Toast.success('删除成功')
+      // 重新拉取购物车数据
+      context.dispatch('getCartAction')
     }
   },
   getters: {
